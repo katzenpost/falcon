@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: (c) 2026 David Stainton
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 // Package padded512 wraps the PQClean Falcon-padded-512 reference C
 // implementation. Signatures are emitted in the padded encoding and

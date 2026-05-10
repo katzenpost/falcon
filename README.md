@@ -11,7 +11,7 @@ The C is vendored from
 MIT-licensed by the Falcon Project; the licence text is preserved
 alongside each vendored copy in `padded512/LICENSE` and
 `padded1024/LICENSE`. The thin Go wrapper added by this repository is
-released under AGPL-3.0-only; see the top-level `LICENSE`.
+also released under the MIT licence; see the top-level `LICENSE`.
 
 ## Parameter sets
 
