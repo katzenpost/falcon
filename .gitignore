@@ -1,0 +1,10 @@
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.test
+*.out
+.idea/
+.vscode/
