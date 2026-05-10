@@ -1,0 +1,47 @@
+name: CI
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Display toolchain
+        run: |
+          go version
+          ${CC:-cc} --version || true
+
+      - name: Build
+        env:
+          CGO_ENABLED: "1"
+        run: go build -v ./...
+
+      - name: Test
+        env:
+          CGO_ENABLED: "1"
+        run: go test -v -count=1 ./...
+
+      - name: Test with race detector
+        env:
+          CGO_ENABLED: "1"
+        run: go test -race -count=1 ./...
+
+      - name: Vet
+        run: go vet ./...
