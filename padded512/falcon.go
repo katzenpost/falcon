@@ -11,7 +11,7 @@
 // in this directory.
 package padded512
 
-// #cgo CFLAGS: -O3 -fomit-frame-pointer
+// #cgo CFLAGS: -O3 -fomit-frame-pointer -include namespace.h
 // #include "api.h"
 import "C"
 
