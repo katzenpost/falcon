@@ -84,21 +84,35 @@ fixtures hashed by Open Quantum Safe's
 [`liboqs`](https://github.com/open-quantum-safe/liboqs) in
 `tests/KATs/sig/kats.json` under each variant's `"all"` field.
 
-A human auditor can confirm provenance with two commands and one
-comparison:
+A human auditor can confirm provenance with one command:
+
+```sh
+scripts/verify-kat-against-liboqs.sh
+```
+
+The script fetches the current `tests/KATs/sig/kats.json` from
+[`open-quantum-safe/liboqs`](https://github.com/open-quantum-safe/liboqs)
+and compares the `"all"` digest of each padded variant against the
+SHA-256 of our vendored `.rsp` file. A clean run looks like:
+
+```
+Falcon-padded-512    OK   362ecc0537ca1fe25143fb7ccb04de8ee7703469d13ebcf311ab124a5c374a65
+Falcon-padded-1024   OK   907a4931ddc2ce8360478a45f1bffededd6a04015b00233ecd851a62ecba06c1
+```
+
+To pin against a specific liboqs commit rather than `main`, set
+`LIBOQS_REF=<sha-or-tag>` in the environment.
+
+To do the comparison by hand without running the script:
 
 ```sh
 sha256sum padded512/testdata/PQCsignKAT_falcon-padded-512.rsp
-# 362ecc0537ca1fe25143fb7ccb04de8ee7703469d13ebcf311ab124a5c374a65
-
 sha256sum padded1024/testdata/PQCsignKAT_falcon-padded-1024.rsp
-# 907a4931ddc2ce8360478a45f1bffededd6a04015b00233ecd851a62ecba06c1
 ```
 
-Both values are published verbatim in liboqs's
-[`tests/KATs/sig/kats.json`](https://github.com/open-quantum-safe/liboqs/blob/main/tests/KATs/sig/kats.json)
-under `"Falcon-padded-512"."all"` and `"Falcon-padded-1024"."all"`
-respectively.
+then compare against the `all` fields under `Falcon-padded-512` and
+`Falcon-padded-1024` in
+[`liboqs/tests/KATs/sig/kats.json`](https://github.com/open-quantum-safe/liboqs/blob/main/tests/KATs/sig/kats.json).
 
 `TestCanonicalKATFingerprint` in each subpackage pins the on-disk
 file against the literal constant in the test source; `TestNistKAT`
