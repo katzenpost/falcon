@@ -105,4 +105,5 @@ jobs:
         shell: msys2 {0}
         env:
           CGO_ENABLED: "1"
+          GOTOOLCHAIN: auto
         run: go vet ./...
