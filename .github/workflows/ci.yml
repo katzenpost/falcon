@@ -6,7 +6,7 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  test-unix:
     strategy:
       fail-fast: false
       matrix:
@@ -44,4 +44,61 @@ jobs:
         run: go test -race -count=1 ./...
 
       - name: Vet
+        run: go vet ./...
+
+  test-windows:
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        ENVIRONMENT: ["UCRT64", "MINGW64"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.ENVIRONMENT }}
+          install: >-
+            base-devel
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-gcc
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-x86_64-go
+            mingw-w64-ucrt-x86_64-go
+            make
+            git
+            gcc
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Display toolchain
+        shell: msys2 {0}
+        run: |
+          uname -a
+          gcc -v
+          go version
+
+      - name: Build
+        shell: msys2 {0}
+        env:
+          CGO_ENABLED: "1"
+          GOTOOLCHAIN: auto
+        run: go build -v ./...
+
+      - name: Test
+        shell: msys2 {0}
+        env:
+          CGO_ENABLED: "1"
+          GOTOOLCHAIN: auto
+        run: go test -v -count=1 ./...
+
+      - name: Vet
+        shell: msys2 {0}
         run: go vet ./...
