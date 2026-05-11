@@ -67,8 +67,51 @@ go test  ./...
 
 ## Provenance
 
+### Vendored sources
+
 | Source                                                    | Imported as           |
 |-----------------------------------------------------------|-----------------------|
 | `PQClean/crypto_sign/falcon-padded-512/clean/`            | `padded512/`          |
 | `PQClean/crypto_sign/falcon-padded-1024/clean/`           | `padded1024/`         |
 | `PQClean/common/{fips202,randombytes}.{c,h}`              | duplicated into both  |
+
+### Verifying the KAT fixtures
+
+Each subpackage ships a canonical NIST Known Answer Test response file
+under `testdata/`. These are the 100-case outputs of PQClean's
+`nistkat` driver for each parameter set, byte-identical to the
+fixtures hashed by Open Quantum Safe's
+[`liboqs`](https://github.com/open-quantum-safe/liboqs) in
+`tests/KATs/sig/kats.json` under each variant's `"all"` field.
+
+A human auditor can confirm provenance with two commands and one
+comparison:
+
+```sh
+sha256sum padded512/testdata/PQCsignKAT_falcon-padded-512.rsp
+# 362ecc0537ca1fe25143fb7ccb04de8ee7703469d13ebcf311ab124a5c374a65
+
+sha256sum padded1024/testdata/PQCsignKAT_falcon-padded-1024.rsp
+# 907a4931ddc2ce8360478a45f1bffededd6a04015b00233ecd851a62ecba06c1
+```
+
+Both values are published verbatim in liboqs's
+[`tests/KATs/sig/kats.json`](https://github.com/open-quantum-safe/liboqs/blob/main/tests/KATs/sig/kats.json)
+under `"Falcon-padded-512"."all"` and `"Falcon-padded-1024"."all"`
+respectively.
+
+`TestCanonicalKATFingerprint` in each subpackage pins the on-disk
+file against the literal constant in the test source; `TestNistKAT`
+regenerates the bytes from the wrapper and asserts `bytes.Equal`
+against the embedded fixture. Either test failing means either our
+implementation has diverged from PQClean's reference or the fixture
+file has been tampered with. To regenerate the fixture from scratch
+(for example after an upstream PQClean update):
+
+```sh
+go test -tags genkat -run TestGenerateKAT ./padded512/
+go test -tags genkat -run TestGenerateKAT ./padded1024/
+```
+
+The non-tagged tests will then independently confirm the regenerated
+files still match the published digests.
