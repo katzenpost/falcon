@@ -1,0 +1,4 @@
+# KAT fixtures must be byte-exact across platforms. Git's autocrlf on
+# Windows would otherwise rewrite LF -> CRLF on checkout and silently
+# corrupt the embedded byte-equality test.
+*.rsp binary
